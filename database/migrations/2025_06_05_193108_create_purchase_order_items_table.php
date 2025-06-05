@@ -18,18 +18,19 @@ return new class extends Migration {
             $table->decimal('unit_price', 12, 2);
             $table->timestamps();
 
-            //referencias
+            // FK a purchase_orders
             $table->foreign('purchase_order_id')
                 ->references('id')
                 ->on('purchase_orders')
                 ->onUpdate('cascade')
                 ->onDelete('cascade');
 
+            // FK a products (cambiamos restrict por no action)
             $table->foreign('product_id')
                 ->references('id')
                 ->on('products')
                 ->onUpdate('cascade')
-                ->onDelete('restrict');
+                ->onDelete('no action');
         });
     }
 

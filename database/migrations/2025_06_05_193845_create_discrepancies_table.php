@@ -28,18 +28,19 @@ return new class extends Migration {
             $table->dateTime('reported_at')->useCurrent();
             $table->timestamps();
 
-            //referencias
+            // FK a products: sin cascada
             $table->foreign('product_id')
                 ->references('id')
                 ->on('products')
-                ->onUpdate('cascade')
-                ->onDelete('restrict');
+                ->onUpdate('no action')
+                ->onDelete('no action');
 
+            // FK a users (reported_by_user_id): sin cascada
             $table->foreign('reported_by_user_id')
                 ->references('id')
                 ->on('users')
-                ->onUpdate('cascade')
-                ->onDelete('set null');
+                ->onUpdate('no action')
+                ->onDelete('no action');
         });
     }
 

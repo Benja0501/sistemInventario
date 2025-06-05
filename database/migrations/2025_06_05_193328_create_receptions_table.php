@@ -23,18 +23,19 @@ return new class extends Migration {
             ])->default('pending');
             $table->timestamps();
 
-            //referencias 
+            // FK a purchase_orders: sin cascada para evitar rutas múltiples
             $table->foreign('purchase_order_id')
                 ->references('id')
                 ->on('purchase_orders')
-                ->onUpdate('cascade')
-                ->onDelete('restrict');
+                ->onUpdate('no action')
+                ->onDelete('no action');
 
+            // FK a users: sin cascada (onUpdate/no action, onDelete/no action)
             $table->foreign('received_by_user_id')
                 ->references('id')
                 ->on('users')
-                ->onUpdate('cascade')
-                ->onDelete('restrict');
+                ->onUpdate('no action')
+                ->onDelete('no action');
         });
     }
 

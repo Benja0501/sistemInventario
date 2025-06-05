@@ -19,24 +19,22 @@ return new class extends Migration {
             $table->integer('quantity_damaged')->unsigned()->default(0);
             $table->timestamps();
 
-            //referencias
+            // FK a receptions: sin cascada
             $table->foreign('reception_id')
                 ->references('id')
                 ->on('receptions')
-                ->onUpdate('cascade')
-                ->onDelete('cascade');
+                ->onUpdate('no action')
+                ->onDelete('no action');
 
+            // FK a products: sin cascada
             $table->foreign('product_id')
                 ->references('id')
                 ->on('products')
-                ->onUpdate('cascade')
-                ->onDelete('restrict');
+                ->onUpdate('no action')
+                ->onDelete('no action');
         });
     }
 
-    /**
-     * Reverse the migrations.
-     */
     public function down(): void
     {
         Schema::dropIfExists('reception_items');

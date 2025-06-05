@@ -15,7 +15,7 @@ return new class extends Migration {
             $table->string('order_number')->unique();
             $table->unsignedBigInteger('created_by_user_id');
             $table->unsignedBigInteger('supplier_id');
-            $table->dateTime('created_at');
+            $table->dateTime('order_date')->nullable();
             $table->date('expected_delivery_date')->nullable();
             $table->decimal('total_amount', 12, 2)->default(0);
             $table->enum('status', [
@@ -34,13 +34,13 @@ return new class extends Migration {
                 ->references('id')
                 ->on('users')
                 ->onUpdate('cascade')
-                ->onDelete('restrict');
+                ->onDelete('no action');
 
             $table->foreign('supplier_id')
                 ->references('id')
                 ->on('suppliers')
                 ->onUpdate('cascade')
-                ->onDelete('restrict');
+                ->onDelete('no action');
         });
     }
 
