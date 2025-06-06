@@ -3,64 +3,66 @@
 namespace App\Http\Controllers;
 
 use App\Models\Product;
+use App\Models\Category;
 use App\Http\Requests\StoreProductRequest;
 use App\Http\Requests\UpdateProductRequest;
 
 class ProductController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
     public function index()
     {
-        //
+        $products = Product::with('category')
+            ->orderBy('name')
+            ->paginate(20);
+
+        return view('products.index', compact('products'));
     }
 
-    /**
-     * Show the form for creating a new resource.
-     */
     public function create()
     {
-        //
+        $categories = Category::all();
+        return view('products.create', compact('categories'));
     }
 
-    /**
-     * Store a newly created resource in storage.
-     */
     public function store(StoreProductRequest $request)
     {
-        //
+        $data = $request->validated();
+        Product::create($data);
+
+        return redirect()->route('products.index')
+            ->with('success', 'Producto creado correctamente.');
     }
 
-    /**
-     * Display the specified resource.
-     */
     public function show(Product $product)
     {
-        //
+        $product->load(['category', 'batches', 'discrepancies']);
+        return view('products.show', compact('product'));
     }
 
-    /**
-     * Show the form for editing the specified resource.
-     */
     public function edit(Product $product)
     {
-        //
+        $categories = Category::all();
+        return view('products.edit', compact('product', 'categories'));
     }
 
-    /**
-     * Update the specified resource in storage.
-     */
     public function update(UpdateProductRequest $request, Product $product)
     {
-        //
+        $data = $request->validated();
+        $product->update($data);
+
+        return redirect()->route('products.index')
+            ->with('success', 'Producto actualizado correctamente.');
     }
 
-    /**
-     * Remove the specified resource from storage.
-     */
     public function destroy(Product $product)
     {
-        //
+        if ($product->purchaseOrderItems()->exists() || $product->receptionItems()->exists()) {
+            return redirect()->route('products.index')
+                ->with('error', 'No se puede eliminar un producto con transacciones registradas.');
+        }
+
+        $product->delete();
+        return redirect()->route('products.index')
+            ->with('success', 'Producto eliminado correctamente.');
     }
 }

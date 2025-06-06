@@ -3,64 +3,82 @@
 namespace App\Http\Controllers;
 
 use App\Models\Discrepancy;
+use App\Models\Product;
 use App\Http\Requests\StoreDiscrepancyRequest;
 use App\Http\Requests\UpdateDiscrepancyRequest;
+use Illuminate\Support\Facades\Auth;
+use Carbon\Carbon;
 
 class DiscrepancyController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
     public function index()
     {
-        //
+        $discrepancies = Discrepancy::with(['product', 'reporter'])
+            ->orderBy('reported_at', 'desc')
+            ->paginate(15);
+
+        return view('discrepancies.index', compact('discrepancies'));
     }
 
-    /**
-     * Show the form for creating a new resource.
-     */
     public function create()
     {
-        //
+        $products = Product::where('status', 'active')->get();
+        return view('discrepancies.create', compact('products'));
     }
 
-    /**
-     * Store a newly created resource in storage.
-     */
     public function store(StoreDiscrepancyRequest $request)
     {
-        //
+        $data = $request->validated();
+
+        Discrepancy::create([
+            'product_id' => $data['product_id'],
+            'system_quantity' => $data['system_quantity'],
+            'physical_quantity' => $data['physical_quantity'],
+            'discrepancy_type' => $data['discrepancy_type'],
+            'note' => $data['note'] ?? null,
+            'evidence_path' => $data['evidence_path'] ?? null,
+            'reported_by_user_id' => Auth::id(),
+            'reported_at' => Carbon::now(),
+        ]);
+
+        return redirect()->route('discrepancies.index')
+            ->with('success', 'Discrepancia registrada correctamente.');
     }
 
-    /**
-     * Display the specified resource.
-     */
     public function show(Discrepancy $discrepancy)
     {
-        //
+        $discrepancy->load(['product', 'reporter']);
+        return view('discrepancies.show', compact('discrepancy'));
     }
 
-    /**
-     * Show the form for editing the specified resource.
-     */
     public function edit(Discrepancy $discrepancy)
     {
-        //
+        $products = Product::where('status', 'active')->get();
+        return view('discrepancies.edit', compact('discrepancy', 'products'));
     }
 
-    /**
-     * Update the specified resource in storage.
-     */
     public function update(UpdateDiscrepancyRequest $request, Discrepancy $discrepancy)
     {
-        //
+        $data = $request->validated();
+
+        $discrepancy->update([
+            'product_id' => $data['product_id'],
+            'system_quantity' => $data['system_quantity'],
+            'physical_quantity' => $data['physical_quantity'],
+            'discrepancy_type' => $data['discrepancy_type'],
+            'note' => $data['note'] ?? null,
+            'evidence_path' => $data['evidence_path'] ?? null,
+            'reported_at' => Carbon::parse($data['reported_at']),
+        ]);
+
+        return redirect()->route('discrepancies.index')
+            ->with('success', 'Discrepancia actualizada correctamente.');
     }
 
-    /**
-     * Remove the specified resource from storage.
-     */
     public function destroy(Discrepancy $discrepancy)
     {
-        //
+        $discrepancy->delete();
+        return redirect()->route('discrepancies.index')
+            ->with('success', 'Discrepancia eliminada.');
     }
 }

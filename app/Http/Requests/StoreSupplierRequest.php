@@ -11,7 +11,7 @@ class StoreSupplierRequest extends FormRequest
      */
     public function authorize(): bool
     {
-        return false;
+        return auth()->check();
     }
 
     /**
@@ -22,7 +22,12 @@ class StoreSupplierRequest extends FormRequest
     public function rules(): array
     {
         return [
-            //
+            'business_name' => 'required|string|max:100',
+            'tax_id'        => 'required|string|unique:suppliers,tax_id',
+            'address'       => 'nullable|string|max:150',
+            'phone'         => 'nullable|string|max:30',
+            'email'         => 'nullable|email|max:100',
+            'status'        => 'required|in:active,inactive',
         ];
     }
 }

@@ -11,18 +11,18 @@ class StoreDiscrepancyRequest extends FormRequest
      */
     public function authorize(): bool
     {
-        return false;
+        return auth()->check();
     }
 
-    /**
-     * Get the validation rules that apply to the request.
-     *
-     * @return array<string, \Illuminate\Contracts\Validation\ValidationRule|array<mixed>|string>
-     */
     public function rules(): array
     {
         return [
-            //
+            'product_id'        => 'required|exists:products,id',
+            'system_quantity'   => 'required|integer|min:0',
+            'physical_quantity' => 'required|integer|min:0',
+            'discrepancy_type'  => 'required|in:missing,surplus,damaged,wrong_location,other',
+            'note'              => 'nullable|string|max:500',
+            'evidence_path'     => 'nullable|string|max:255',
         ];
     }
 }

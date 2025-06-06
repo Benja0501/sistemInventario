@@ -11,18 +11,20 @@ class UpdateSupplierRequest extends FormRequest
      */
     public function authorize(): bool
     {
-        return false;
+        return auth()->check();
     }
 
-    /**
-     * Get the validation rules that apply to the request.
-     *
-     * @return array<string, \Illuminate\Contracts\Validation\ValidationRule|array<mixed>|string>
-     */
     public function rules(): array
     {
+        $supplierId = $this->route('supplier')->id;
+
         return [
-            //
+            'business_name' => 'required|string|max:100',
+            'tax_id'        => 'required|string|unique:suppliers,tax_id,' . $supplierId,
+            'address'       => 'nullable|string|max:150',
+            'phone'         => 'nullable|string|max:30',
+            'email'         => 'nullable|email|max:100',
+            'status'        => 'required|in:active,inactive',
         ];
     }
 }
