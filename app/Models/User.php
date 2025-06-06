@@ -21,6 +21,7 @@ class User extends Authenticatable
         'name',
         'email',
         'password',
+        'role_id',
     ];
 
     /**
@@ -44,5 +45,26 @@ class User extends Authenticatable
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
         ];
+    }
+    public function role()
+    {
+        return $this->belongsTo(Role::class);
+    }
+    // Relación con órdenes de compra creadas
+    public function purchaseOrders()
+    {
+        return $this->hasMany(PurchaseOrder::class, 'created_by_user_id');
+    }
+
+    // Relación con recepciones realizadas
+    public function receptions()
+    {
+        return $this->hasMany(Reception::class, 'received_by_user_id');
+    }
+
+    // Notificaciones provistas por Laravel (via Database)
+    public function notifications()
+    {
+        return $this->morphMany(\Illuminate\Notifications\DatabaseNotification::class, 'notifiable')->orderBy('created_at', 'desc');
     }
 }

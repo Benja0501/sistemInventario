@@ -9,4 +9,13 @@ class Location extends Model
 {
     /** @use HasFactory<\Database\Factories\LocationFactory> */
     use HasFactory;
+    protected $fillable = [
+        'name',
+        'description',
+    ];
+
+    public function productLocations()
+    {
+        return $this->hasMany(ProductLocation::class);
+    }
 }
